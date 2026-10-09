@@ -1,0 +1,391 @@
+.design-studio {
+  padding: 12vw 5vw;
+  background: #f3f0ea;
+  border-top: 1px solid rgba(36, 34, 31, 0.12);
+}
+
+.studio-heading {
+  max-width: 800px;
+}
+
+.studio-heading h2 {
+  margin-top: 35px;
+  font-size: clamp(55px, 7vw, 105px);
+  line-height: 0.92;
+  font-weight: 300;
+  letter-spacing: -4px;
+}
+
+.studio-heading h2 em {
+  font-family: "Playfair Display", serif;
+  font-weight: 400;
+}
+
+.studio-heading > p:last-child {
+  margin-top: 35px;
+  max-width: 480px;
+  line-height: 1.8;
+  opacity: 0.6;
+}
+
+.studio-grid {
+  margin-top: 90px;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 7vw;
+}
+
+.studio-label {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(36, 34, 31, 0.15);
+  font-size: 9px;
+  letter-spacing: 2px;
+  opacity: 0.55;
+}
+
+/* UPLOADER */
+
+.image-uploader {
+  position: relative;
+  height: 600px;
+  margin-top: 20px;
+  border: 1px dashed rgba(36, 34, 31, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  cursor: pointer;
+  transition:
+    border-color 0.3s ease,
+    background 0.3s ease;
+}
+
+.image-uploader:hover,
+.image-uploader.dragging {
+  border-color: #24221f;
+  background: rgba(36, 34, 31, 0.035);
+}
+
+.upload-content {
+  text-align: center;
+}
+
+.upload-icon {
+  font-size: 45px;
+  font-weight: 200;
+  margin-bottom: 20px;
+}
+
+.upload-content h3 {
+  font-weight: 400;
+  font-size: 18px;
+}
+
+.upload-content p {
+  margin-top: 12px;
+  font-size: 11px;
+  line-height: 1.7;
+  opacity: 0.5;
+}
+
+.room-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: previewReveal 0.5s ease forwards;
+}
+
+.preview-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 25px;
+  background: linear-gradient(
+    transparent 60%,
+    rgba(0, 0, 0, 0.45)
+  );
+  color: white;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.image-uploader:hover .preview-overlay {
+  opacity: 1;
+}
+
+.preview-overlay span {
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+/* FORM */
+
+.studio-form {
+  padding-top: 0;
+}
+
+.form-group {
+  margin-top: 40px;
+}
+
+.form-group label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  font-size: 12px;
+}
+
+.color-limit {
+  opacity: 0.4;
+}
+
+.option-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.option,
+.budget-option,
+.color-option {
+  border: 1px solid rgba(36, 34, 31, 0.18);
+  background: transparent;
+  color: #24221f;
+  transition: all 0.25s ease;
+}
+
+.option {
+  padding: 15px 12px;
+  text-align: left;
+  font-size: 11px;
+}
+
+.option:hover,
+.option.active {
+  background: #24221f;
+  color: #f3f0ea;
+}
+
+.budget-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.budget-option {
+  padding: 13px;
+  font-size: 11px;
+}
+
+.budget-option:hover,
+.budget-option.active {
+  background: #24221f;
+  color: #f3f0ea;
+}
+
+.color-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.color-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  font-size: 10px;
+}
+
+.color-option:hover,
+.color-option.active {
+  border-color: #24221f;
+}
+
+.color-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.color-dot.beige {
+  background: #d8c7ad;
+}
+
+.color-dot.white {
+  background: #ffffff;
+}
+
+.color-dot.brown {
+  background: #80634b;
+}
+
+.color-dot.green {
+  background: #7d8971;
+}
+
+.color-dot.blue {
+  background: #8296a5;
+}
+
+.color-dot.black {
+  background: #252525;
+}
+
+/* GENERATE */
+
+.generate-button {
+  width: 100%;
+  margin-top: 55px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  border: 0;
+  background: #24221f;
+  color: #f3f0ea;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  transition:
+    transform 0.3s ease,
+    padding 0.3s ease;
+}
+
+.generate-button:hover {
+  transform: translateY(-3px);
+  padding-left: 25px;
+  padding-right: 25px;
+}
+
+@keyframes previewReveal {
+  from {
+    opacity: 0;
+    transform: scale(1.03);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 900px) {
+  .studio-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .image-uploader {
+    height: 500px;
+  }
+}
+
+@media (max-width: 600px) {
+  .design-studio {
+    padding: 100px 20px;
+  }
+
+  .studio-heading h2 {
+    font-size: 60px;
+    letter-spacing: -3px;
+  }
+
+  .studio-grid {
+    margin-top: 60px;
+  }
+
+  .image-uploader {
+    height: 400px;
+  }
+}
+.generate-button:disabled {
+  opacity: 0.55;
+  cursor: wait;
+  transform: none;
+}
+
+.designer-error {
+  margin-top: 25px;
+  padding: 14px 16px;
+  border: 1px solid rgba(160, 60, 40, 0.35);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.design-response {
+  margin-top: 100px;
+  padding-top: 30px;
+  border-top: 1px solid rgba(36, 34, 31, 0.15);
+  animation: fadeUp 0.7s ease forwards;
+}
+
+.response-grid {
+  margin-top: 45px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+.response-grid > div {
+  padding: 30px;
+  border-left: 1px solid rgba(36, 34, 31, 0.15);
+}
+
+.response-label {
+  font-size: 9px;
+  letter-spacing: 2px;
+  opacity: 0.5;
+  margin-bottom: 18px;
+}
+
+.job-id {
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.response-status {
+  margin-top: 10px;
+  font-size: 11px;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.response-muted {
+  margin-top: 10px;
+  font-size: 11px;
+  opacity: 0.55;
+}
+
+@media (max-width: 700px) {
+  .response-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.generated-result {
+  margin-top: 60px;
+}
+
+.generated-room-image {
+  display: block;
+  width: 100%;
+  max-width: 1000px;
+  margin-top: 20px;
+  border-radius: 2px;
+  animation: generatedImageFade 0.8s ease forwards;
+}
+
+@keyframes generatedImageFade {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
