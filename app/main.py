@@ -1,13 +1,14 @@
 from pathlib import Path
 import json
 import base64
-
-from contextlib import asynccontextmanager
 import os
 import tempfile
+from contextlib import asynccontextmanager
 
 import requests
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+from fastapi.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.schemas import RoomAnalysis, DesignRequest, DesignPlan
 from app.rag import load_catalog
@@ -36,6 +37,19 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="AI Interior Designer API",
     lifespan=lifespan
+)
+
+
+# ============================================================
+# CORS
+# ============================================================
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
@@ -135,10 +149,12 @@ async def full_design_pipeline(
         image_bytes = await file.read()
 
         if not image_bytes:
+
             raise HTTPException(
                 status_code=400,
                 detail="Uploaded image is empty."
             )
+
 
         # ------------------------------------------------------
         # Parse preferred colors
@@ -150,7 +166,11 @@ async def full_design_pipeline(
             if color.strip()
         ]
 
-        print("Preferred colors:", colors_list)
+        print(
+            "Preferred colors:",
+            colors_list
+        )
+
 
         # ------------------------------------------------------
         # STEP 1 — VLM
@@ -178,6 +198,7 @@ async def full_design_pipeline(
 
         print("VLM analysis completed.")
 
+
         # ------------------------------------------------------
         # STEP 2 — LLM + RAG
         # ------------------------------------------------------
@@ -194,6 +215,7 @@ async def full_design_pipeline(
 
         print("Design plan created.")
 
+
         # ------------------------------------------------------
         # STEP 3 — Create temporary image file
         # ------------------------------------------------------
@@ -207,7 +229,11 @@ async def full_design_pipeline(
 
             temp_path = temp_file.name
 
-        print("Temporary image created:", temp_path)
+        print(
+            "Temporary image created:",
+            temp_path
+        )
+
 
         # ------------------------------------------------------
         # STEP 4 — Create Google Drive generation job
@@ -227,6 +253,7 @@ async def full_design_pipeline(
             f"Generation job created successfully: {job_id}"
         )
 
+
         # ------------------------------------------------------
         # STEP 5 — Return pipeline result
         # ------------------------------------------------------
@@ -234,11 +261,10 @@ async def full_design_pipeline(
         return {
             "job_id": job_id,
             "generation_status": "queued",
-
             "room_analysis": room.model_dump(),
-
             "design_plan": design.model_dump()
         }
+
 
     # ----------------------------------------------------------
     # VLM / network error
@@ -251,6 +277,7 @@ async def full_design_pipeline(
             detail=f"VLM service call failed: {str(e)}"
         )
 
+
     # ----------------------------------------------------------
     # HTTPException — preserve original status/detail
     # ----------------------------------------------------------
@@ -258,6 +285,7 @@ async def full_design_pipeline(
     except HTTPException:
 
         raise
+
 
     # ----------------------------------------------------------
     # Other errors
@@ -270,6 +298,7 @@ async def full_design_pipeline(
             detail=f"Pipeline failed: {str(e)}"
         )
 
+
     # ----------------------------------------------------------
     # Always remove temporary local image
     # ----------------------------------------------------------
@@ -279,6 +308,7 @@ async def full_design_pipeline(
         if temp_path and os.path.exists(temp_path):
 
             try:
+
                 os.remove(temp_path)
 
                 print(
@@ -292,6 +322,11 @@ async def full_design_pipeline(
                     f"{cleanup_error}"
                 )
 
+
+# ============================================================
+# Generation job status
+# ============================================================
+
 @app.get("/job/{job_id}")
 def get_generation_job(job_id: str):
 
@@ -304,33 +339,55 @@ def get_generation_job(job_id: str):
     )
 
     job_dir = jobs_dir / job_id
+
     job_file = job_dir / "job.json"
-    result_file = output_dir / job_id / "result.png"
+
+    result_file = (
+        output_dir /
+        job_id /
+        "result.png"
+    )
+
 
     # --------------------------------------------------
     # Check job exists
     # --------------------------------------------------
 
     if not job_file.exists():
+
         raise HTTPException(
             status_code=404,
             detail=f"Job {job_id} not found"
         )
 
+
     # --------------------------------------------------
     # Read job information
     # --------------------------------------------------
 
-    with open(job_file, "r", encoding="utf-8") as f:
+    with open(
+        job_file,
+        "r",
+        encoding="utf-8"
+    ) as f:
+
         job = json.load(f)
 
-    status = job.get("status", "unknown")
+
+    status = job.get(
+        "status",
+        "unknown"
+    )
+
 
     # --------------------------------------------------
     # If generation is not completed
     # --------------------------------------------------
 
-    if status != "completed" or not result_file.exists():
+    if (
+        status != "completed"
+        or not result_file.exists()
+    ):
 
         return {
             "job_id": job_id,
@@ -338,14 +395,20 @@ def get_generation_job(job_id: str):
             "result_available": False
         }
 
+
     # --------------------------------------------------
     # Read generated image
     # --------------------------------------------------
 
-    with open(result_file, "rb") as f:
+    with open(
+        result_file,
+        "rb"
+    ) as f:
+
         image_base64 = base64.b64encode(
             f.read()
         ).decode("utf-8")
+
 
     # --------------------------------------------------
     # Return completed result
@@ -357,3 +420,35 @@ def get_generation_job(job_id: str):
         "result_available": True,
         "image_base64": image_base64
     }
+
+
+# ============================================================
+# Serve generated image directly
+# ============================================================
+
+@app.get("/job/{job_id}/image")
+def get_generation_image(job_id: str):
+
+    output_dir = Path(
+        r"G:\My Drive\ai_interior_design\generated"
+    )
+
+    result_file = (
+        output_dir /
+        job_id /
+        "result.png"
+    )
+
+
+    if not result_file.exists():
+
+        raise HTTPException(
+            status_code=404,
+            detail="Generated image is not available yet."
+        )
+
+
+    return FileResponse(
+        result_file,
+        media_type="image/png"
+    )
